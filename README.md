@@ -315,6 +315,74 @@ CORS_ORIGINS=["http://localhost:3000"]
 
 ---
 
+## Configuración para el desarrollador del frontend
+
+Si solo vas a trabajar con la API (ej. desarrollar el dashboard Flutter) **no necesitas el token de Telegram ni Ollama**. Sigue estos pasos:
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/tu-usuario/bot-asistencias.git
+cd bot-asistencias
+```
+
+### 2. Crear entorno virtual e instalar dependencias
+
+```bash
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Crear la base de datos
+
+```bash
+psql -U postgres -c "CREATE USER bot_asistencias WITH PASSWORD 'bot123';"
+psql -U postgres -c "CREATE DATABASE asistencias_db WITH OWNER = bot_asistencias ENCODING = 'UTF8' TEMPLATE = template0;"
+psql -U postgres -d asistencias_db -c "GRANT ALL ON SCHEMA public TO bot_asistencias;"
+```
+
+### 4. Aplicar el schema
+
+Esto crea todas las tablas y el usuario de prueba `admin / admin123`:
+
+```bash
+psql -U bot_asistencias -d asistencias_db -f schema.sql
+```
+
+### 5. Configurar el .env
+
+```bash
+cp .env.example .env
+```
+
+Para trabajar solo con la API solo necesitas editar estas dos líneas en el `.env`:
+
+```env
+DATABASE_URL=postgresql://bot_asistencias:bot123@localhost:5432/asistencias_db
+JWT_SECRET=cualquier_string_largo_aqui
+```
+
+El resto de variables (`TELEGRAM_TOKEN`, `OLLAMA_URL`, etc.) pueden dejarse con los valores de ejemplo.
+
+### 6. Levantar la API
+
+```bash
+uvicorn api.main:app --reload --port 8000
+```
+
+### 7. Probar el login
+
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"login": "admin", "password": "admin123"}'
+```
+
+O directamente desde el navegador en **http://localhost:8000/docs** (Swagger UI interactivo).
+
+---
+
 ## Notas de desarrollo
 
 - El **bot** usa SQLite (`aiosqlite`) como almacenamiento propio. El objetivo es migrarlo a PostgreSQL en una fase posterior para que bot y API compartan la misma base de datos.
