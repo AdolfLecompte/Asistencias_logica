@@ -1,0 +1,29 @@
+# Entorno virtual
+venv/
+.venv/
+
+# Variables de entorno (contiene tokens y passwords)
+.env
+
+# Base de datos SQLite del bot
+*.db
+*.db-shm
+*.db-wal
+
+# Evidencias (imágenes de justificantes)
+evidencias/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Claude Code
+.claude/
