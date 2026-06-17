@@ -7,11 +7,11 @@ Sistema completo para registro de asistencias escolares mediante Telegram. Compu
 ## Arquitectura
 
 ```
-┌─────────────────────────┐        ┌──────────────────────────┐
-│   BOT TELEGRAM           │        │   API REST (FastAPI)      │
-│   python-telegram-bot   │        │   uvicorn + asyncpg       │
-│   Proceso: python main.py│        │   Proceso: uvicorn ...    │
-└────────────┬────────────┘        └────────────┬─────────────┘
+┌───────────────────────── ┐        ┌──────────────────────────┐
+│   BOT TELEGRAM           │        │   API REST (FastAPI)     │
+│   python-telegram-bot    │        │    uvicorn + asyncpg     │
+│   Proceso: python main.py│        │   Proceso: uvicorn ...   │
+└────────────┬─────────────┘        └────────────┬─────────────┘
              │                                   │
              └─────────────┬─────────────────────┘
                            │

@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     JWT_REFRESH_EXPIRE_DAYS: int = 7
 
     # CORS — formato JSON en .env: ["https://ejemplo.com"]
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost:8080"]
+    CORS_ORIGINS: list[str] = ["*"]
 
     # Archivos de evidencias (compartido con el bot)
     EVIDENCIAS_DIR: str = "evidencias"

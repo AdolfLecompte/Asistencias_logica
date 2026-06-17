@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class GrupoCreate(BaseModel):
-    telegram_chat_id: int
+    telegram_chat_id: str
     nombre: str
     materia: str | None = None
 
@@ -17,7 +17,7 @@ class GrupoUpdate(BaseModel):
 
 class GrupoResponse(BaseModel):
     id: int
-    telegram_chat_id: int
+    telegram_chat_id: str
     nombre: str
     materia: str | None
     activo: bool

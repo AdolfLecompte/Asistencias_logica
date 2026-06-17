@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.core.database import get_conn
-from api.dependencies.auth import get_current_profesor, get_profesor_en_grupo
+from api.dependencies.auth import get_current_profesor, get_profesor_en_grupo, require_admin
 from api.schemas.grupos import (
     ActualizarInscripcionRequest,
     AsignarProfesorRequest,
@@ -15,16 +15,29 @@ from api.schemas.grupos import (
 router = APIRouter(prefix="/grupos", tags=["Grupos"])
 
 
+@router.get("/all", response_model=list[GrupoResponse])
+async def listar_todos_grupos(admin: dict = Depends(require_admin)):
+    """Admin: lista todos los grupos existentes."""
+    async with get_conn() as conn:
+        rows = await conn.fetch(
+            "SELECT id, telegram_chat_id, nombre, materia, activo, creado_en FROM grupos ORDER BY nombre"
+        )
+    return [dict(r) for r in rows]
+
+
 @router.get("", response_model=list[GrupoResponse])
 async def listar_mis_grupos(profesor: dict = Depends(get_current_profesor)):
     """Grupos donde el profesor autenticado está asignado."""
     async with get_conn() as conn:
         rows = await conn.fetch(
             """
-            SELECT g.id, g.telegram_chat_id, g.nombre, g.materia, g.activo, g.creado_en
+            SELECT DISTINCT g.id, g.telegram_chat_id, g.nombre, g.materia, g.activo, g.creado_en
             FROM grupos g
-            JOIN grupo_profesores gp ON gp.grupo_id = g.id
-            WHERE gp.profesor_id = $1
+            WHERE g.id IN (
+                SELECT gp.grupo_id FROM grupo_profesores gp WHERE gp.profesor_id = $1
+                UNION
+                SELECT p.grupo_id FROM profesores p WHERE p.id = $1 AND p.grupo_id IS NOT NULL
+            )
             ORDER BY g.nombre
             """,
             profesor["id"],
@@ -45,6 +58,12 @@ async def crear_grupo(body: GrupoCreate, profesor: dict = Depends(get_current_pr
             # Asignar automáticamente al creador
             await conn.execute(
                 "INSERT INTO grupo_profesores (grupo_id, profesor_id) VALUES ($1, $2)",
+                row["id"],
+                profesor["id"],
+            )
+            # Sync grupo_id en profesores si aún no tiene uno asignado
+            await conn.execute(
+                "UPDATE profesores SET grupo_id = $1 WHERE id = $2 AND grupo_id IS NULL",
                 row["id"],
                 profesor["id"],
             )
@@ -113,11 +132,18 @@ async def asignar_profesor(
     profesor: dict = Depends(get_profesor_en_grupo),
 ):
     async with get_conn() as conn:
-        await conn.execute(
-            "INSERT INTO grupo_profesores (grupo_id, profesor_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
-            grupo_id,
-            body.profesor_id,
-        )
+        async with conn.transaction():
+            await conn.execute(
+                "INSERT INTO grupo_profesores (grupo_id, profesor_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+                grupo_id,
+                body.profesor_id,
+            )
+            # Sync grupo_id en profesores si aún no tiene uno asignado
+            await conn.execute(
+                "UPDATE profesores SET grupo_id = $1 WHERE id = $2 AND grupo_id IS NULL",
+                grupo_id,
+                body.profesor_id,
+            )
     return {"detail": "Profesor asignado."}
 
 

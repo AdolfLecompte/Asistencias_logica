@@ -27,7 +27,7 @@ async def listar_sesiones(
                 s.id, s.grupo_id, s.descripcion, s.automatica, s.activa,
                 s.abierta_en, s.cerrada_en, s.creada_por,
                 COUNT(*) FILTER (WHERE a.estado = 'asistio')              AS total_asistencias,
-                COUNT(*) FILTER (WHERE a.estado LIKE 'ausente_%')         AS total_ausentes,
+                COUNT(*) FILTER (WHERE a.estado::text LIKE 'ausente_%')   AS total_ausentes,
                 COUNT(*) FILTER (WHERE a.estado = 'pendiente_revision')   AS total_pendientes
             FROM sesiones s
             LEFT JOIN asistencias a ON a.sesion_id = s.id
@@ -73,7 +73,7 @@ async def obtener_sesion(sesion_id: int, profesor: dict = Depends(get_current_pr
                 s.id, s.grupo_id, s.descripcion, s.automatica, s.activa,
                 s.abierta_en, s.cerrada_en, s.creada_por,
                 COUNT(*) FILTER (WHERE a.estado = 'asistio')              AS total_asistencias,
-                COUNT(*) FILTER (WHERE a.estado LIKE 'ausente_%')         AS total_ausentes,
+                COUNT(*) FILTER (WHERE a.estado::text LIKE 'ausente_%')   AS total_ausentes,
                 COUNT(*) FILTER (WHERE a.estado = 'pendiente_revision')   AS total_pendientes
             FROM sesiones s
             LEFT JOIN asistencias a ON a.sesion_id = s.id

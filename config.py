@@ -81,10 +81,10 @@ ADMIN_IDS: frozenset[int] = _parse_admin_ids(_getenv("ADMIN_IDS", ""))
 NOMBRE_MATERIA = _getenv("NOMBRE_MATERIA", "Clase")
 OLLAMA_URL     = _getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 OLLAMA_MODEL   = _getenv("OLLAMA_MODEL", "gemma3:4b")
-DB_FILE        = _getenv("DB_FILE", "asistencias.db")
+DATABASE_URL   = _getenv("DATABASE_URL", "postgresql://bot_asistencias:bot123@localhost:5432/asistencias_db")
 EVIDENCIAS_DIR = _getenv("EVIDENCIAS_DIR", "evidencias")
 
 # ── Horario automático ───────────────────────────────────────────────────────
-DIAS_CLASE  = _parse_dias_clase(_getenv("DIAS_CLASE", "0,2,4"))
+DIAS_CLASE  = _parse_dias_clase(_getenv("DIAS_CLASE", "0,1,3"))  # PTB v20+: 0=Dom,1=Lun,...,6=Sáb
 HORA_INICIO = _parse_hora(_getenv("HORA_INICIO", "8:00")).replace(tzinfo=ZONA_HORARIA)
 DURACION_ENCUESTA_MINUTOS = int(_getenv("DURACION_ENCUESTA_MINUTOS", "30") or "30")

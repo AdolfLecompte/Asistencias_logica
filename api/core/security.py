@@ -18,7 +18,7 @@ def _now() -> datetime:
     return datetime.now(tz=timezone.utc)
 
 
-def create_access_token(profesor_id: int, telegram_user_id: int) -> str:
+def create_access_token(profesor_id: int, telegram_user_id: str) -> str:
     payload = {
         "sub": str(profesor_id),
         "telegram_user_id": telegram_user_id,

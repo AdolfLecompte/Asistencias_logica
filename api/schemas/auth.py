@@ -18,9 +18,11 @@ class RefreshRequest(BaseModel):
 
 class ProfesorMe(BaseModel):
     id: int
-    telegram_user_id: int
+    telegram_user_id: str
     login: str
     username: str | None
     nombre: str
     apellido: str | None
     email: str | None
+    rol: str
+    grupo_id: int | None

@@ -27,7 +27,7 @@ async def get_current_profesor(
 
     async with get_conn() as conn:
         row = await conn.fetchrow(
-            "SELECT id, telegram_user_id, login, nombre, apellido, username, email, activo "
+            "SELECT id, telegram_user_id, login, nombre, apellido, username, email, activo, rol, grupo_id "
             "FROM profesores WHERE id = $1",
             profesor_id,
         )
@@ -39,6 +39,16 @@ async def get_current_profesor(
         )
 
     return dict(row)
+
+
+async def require_admin(profesor: dict = Depends(get_current_profesor)) -> dict:
+    """Verifica que el profesor autenticado tenga rol admin."""
+    if profesor.get("rol") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requiere rol de administrador.",
+        )
+    return profesor
 
 
 async def get_profesor_en_grupo(grupo_id: int, profesor: dict = Depends(get_current_profesor)) -> dict:

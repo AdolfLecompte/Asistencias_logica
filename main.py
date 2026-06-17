@@ -2,6 +2,7 @@
 Punto de entrada del bot de asistencias.
 Inicializa la base de datos, configura el programador y arranca el bot.
 """
+import asyncio
 import logging
 import os
 
@@ -17,8 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> None:
-    # 1. Preparar el entorno
-    init_db()
+    # 1. Preparar el entorno (crear loop explícito para que PTB lo reutilice)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(init_db())
     os.makedirs(config.EVIDENCIAS_DIR, exist_ok=True)
 
     logger.info("Base de datos y directorios inicializados ✔")
@@ -57,6 +60,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.set_event_loop(asyncio.new_event_loop())
     main()
