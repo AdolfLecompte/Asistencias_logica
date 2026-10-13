@@ -188,18 +188,3 @@ CREATE INDEX idx_profesores_tg            ON profesores(telegram_user_id);
 CREATE INDEX idx_profesores_login         ON profesores(login);
 CREATE INDEX idx_estudiantes_tg           ON estudiantes(telegram_user_id);
 CREATE INDEX idx_evidencias_asistencia    ON evidencias(asistencia_id);
-
--- -------------------------------------------------------------
--- DATOS DE PRUEBA
--- ⚠️  Solo para desarrollo/testing. Eliminar en producción.
--- login: admin | password: admin123
--- -------------------------------------------------------------
-INSERT INTO profesores (telegram_user_id, login, password_hash, nombre, apellido, email)
-VALUES (
-    0,
-    'admin',
-    '$2b$12$sz/wQajPlBm.1aAqut2gC.Pa84CH.9OSjdAkoSSqRPVYFj7/EVAHe',
-    'Admin',
-    'Test',
-    'admin@test.local'
-);
